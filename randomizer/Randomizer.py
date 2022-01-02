@@ -51,10 +51,9 @@ if os.path.exists(names_dic_path):     #cheking dictionary existance, reading it
 
     j = 0
     while j <= amount:
-        for i in range (1,5):
-            ran_name ="_".join(random.sample(names_dic,4))
-        ran_suf = random.randrange(1,999,1)
-        ran_name='_'.join((ran_name,str(ran_suf)))
+        ran_suf = str(random.randrange(1,999,1))
+        ran_name ="_".join(random.sample(names_dic,4))
+        ran_name = "_".join((ran_name,ran_suf))
         if ran_name in list_of_names:
             continue
         else:

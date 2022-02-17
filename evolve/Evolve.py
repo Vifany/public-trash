@@ -19,14 +19,18 @@ class Strain(Source):
 class Mutation(Source):
     def expand(self, strain):
         strain.genome.append(random.choice(self.GENES))
+        print('Sequence expanded')
 
     def remove(self, strain):
         if len(strain.genome)>=1:
             strain.genome.pop(random.randrange(len(strain.genome)))
-    
+            print('Sequence cut down')
+
     def change(self, strain):
-        strain.genome[(random.randrange(len(strain.genome)))] =(
-            random.choice(self.GENES))
+        if len(strain.genome)>=1:
+            strain.genome[(random.randrange(len(strain.genome)))] =(
+                random.choice(self.GENES))
+        print('Sequence link changed')
 
 
 
@@ -41,8 +45,8 @@ class Mutate(Source):
                 1: mutator.remove,
                 2: mutator.change
                 }
-        for i in range(self.mutrate+1):
-            MUT_DIC[random.randrange(2)](strain)
+        for i in range(self.mutrate):
+            MUT_DIC[random.randrange(3)](strain)
 
 class Selection(Source):
     def set_target(self, target_seq):
@@ -79,38 +83,56 @@ class Selection(Source):
         mutator = Mutate()
         counter = 0
         mutator.set_mutrate(1)
-        survived = 0
-        while True:
-            counter += 1
-            print('Iteration ', counter)
-            mutator.evolve(strain)
-            if self.survive(strain, 1) == True:
-                print('Finished sequence: ', strain.genome)
-                print('Survived for ', survived, ' generations')
-                print('With target', self.target)
-                break
-            elif self.survive(strain, 0) == True:
-                survived += 1
-                print('Sequence: ', strain.genome)
-                print('Survived for ', survived, ' generations, evolving...')
-            else:
-                survived = 0
-                print('Sequence extinct: ', strain.genome)
-                print('Reseeding...')
-                strain.spawn(len(self.target)+1)
-            if counter > self.itercap: break
+        pops = []
+        pops.append(strain)
+        evolved = False
+        while True:   
+            for specimen in pops:
+                counter += 1
+                print('Iteration ', counter)
+                print('Population is:', len(pops))
+                if counter > self.itercap: break
+                mutator.evolve(specimen)
+                print ('Specimen sequence: ', specimen.genome)
+                if self.survive(strain, 1) == True:
+                    print('Evolved!')
+                    evolved = True
+                    print('With target', self.target)
+                    break
 
+                elif self.survive(specimen, 0) == True:
+                    print('Survived, duplicating')
+                    pops.append(specimen)
+                
+                else:
+                    print('Died')
+                    pops.remove(specimen)
+
+                if len(pops) == 0:
+                    print('Population extinct, reseeding...')
+                    strain.spawn((len(self.target)+1))
+                    pops.append(strain)
+                elif len(pops) > self.popcap:
+                    print('Population overcrowd, culling...')
+                    sli = int(self.popcap/2)+1
+                    pops = pops[0:sli]
+                    print('Population now', len(pops))
+            if counter > self.itercap: break
+            if evolved: break
 def main():
-    target = input('Input target')
-    threshold = input('Input threshold')
-    iter =  input('Input iteration cap')
+    target = 'GA'
+    threshold = 1
+    iter =  100
+    popcap = 10
     sample = Strain()
     sample.spawn(len(target)+1)
     enviro = Selection()
     enviro.set_threshold(int(threshold))
     enviro.set_target(target)
-    print('Target is:', enviro.target)
+    enviro.set_popcap(int(popcap))
     enviro.set_itercap(int(iter))
+    print('Target is:', enviro.target)
+    print('Over ', enviro.itercap, ' iterations. With ', enviro.popcap, ' popcap')
     enviro.select_print(sample)
 
 main()

@@ -10,6 +10,7 @@ class Source:
 
 class Strain(Source):
     def spawn(self, base_length):
+        self.genome = []
         for i in range(base_length+1):
             self.genome.append(random.choice(self.GENES))
 
@@ -53,12 +54,11 @@ class Selection(Source):
 
     def survive(self, strain, mode):
         check = 0
-        breaker = 0
-        if mode == 1: breaker = len(self.threshold) + 1
-        else: breaker = len(self.target) + 1
+        if mode == 1: breaker = len(self.target)
+        elif mode == 0: breaker = self.threshold
         if len(strain.genome) < len(self.target):
             return False
-        for i in range((len(strain.genome) - len(self.target))):
+        for i in range((len(strain.genome) - len(self.target)+1)):
             for k in range(len(self.target)):
                 if strain.genome[i+k] == self.target[k] : check += 1
                 else: check = 0
@@ -79,24 +79,34 @@ class Selection(Source):
         mutator = Mutate()
         counter = 0
         mutator.set_mutrate(1)
+        survived = 0
         while True:
             counter += 1
             print('Iteration ', counter)
             mutator.evolve(strain)
-            if self.survive(strain, 0) == True:
+            if self.survive(strain, 1) == True:
                 print('Finished sequence: ', strain.genome)
+                print('Survived for ', survived, ' generations')
                 print('With target', self.target)
                 break
-            else: print('Intermedeate sequence:', strain.genome)
+            elif self.survive(strain, 0) == True:
+                survived += 1
+                print('Sequence: ', strain.genome)
+                print('Survived for ', survived, ' generations, evolving')
+            else:
+                survived = 0
+                print('Sequence extinct: ', strain.genome)
+                print('Reseeding')
+                strain.spawn(len(self.target)+1)
             if counter > self.itercap: break
 
 def main():
     target = input('Input target')
     print('Target is', target)
     sample = Strain()
-    sample.spawn(5)
+    sample.spawn(len(target)+1)
     enviro = Selection()
-    enviro.set_threshold(3)
+    enviro.set_threshold(2)
     enviro.set_target(target)
     enviro.set_itercap(1000)
     enviro.select_print(sample)

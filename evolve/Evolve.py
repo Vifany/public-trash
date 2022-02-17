@@ -53,12 +53,12 @@ class Selection(Source):
                 self.target.append(sym)
 
     def survive(self, strain, mode):
-        check = 0
         if mode == 1: breaker = len(self.target)
         elif mode == 0: breaker = self.threshold
         if len(strain.genome) < len(self.target):
             return False
         for i in range((len(strain.genome) - len(self.target)+1)):
+            check = 0
             for k in range(len(self.target)):
                 if strain.genome[i+k] == self.target[k] : check += 1
                 else: check = 0
@@ -102,13 +102,15 @@ class Selection(Source):
 
 def main():
     target = input('Input target')
-    print('Target is', target)
+    threshold = input('Input threshold')
+    iter =  input('Input iteration cap')
     sample = Strain()
     sample.spawn(len(target)+1)
     enviro = Selection()
-    enviro.set_threshold(2)
+    enviro.set_threshold(int(threshold))
     enviro.set_target(target)
-    enviro.set_itercap(1000)
+    print('Target is:', enviro.target)
+    enviro.set_itercap(int(iter))
     enviro.select_print(sample)
 
 main()

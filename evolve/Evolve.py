@@ -92,11 +92,11 @@ class Selection(Source):
             elif self.survive(strain, 0) == True:
                 survived += 1
                 print('Sequence: ', strain.genome)
-                print('Survived for ', survived, ' generations, evolving')
+                print('Survived for ', survived, ' generations, evolving...')
             else:
                 survived = 0
                 print('Sequence extinct: ', strain.genome)
-                print('Reseeding')
+                print('Reseeding...')
                 strain.spawn(len(self.target)+1)
             if counter > self.itercap: break
 

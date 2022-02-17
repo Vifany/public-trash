@@ -87,23 +87,25 @@ class Selection(Source):
         pops.append(strain)
         evolved = False
         while True:   
+            counter += 1
+            print('Iteration ', counter)
             for specimen in pops:
-                counter += 1
-                print('Iteration ', counter)
                 print('Population is:', len(pops))
-                if counter > self.itercap: break
+                if counter > self.itercap: 
+                    print('Iterations limit reached')
+                    break
                 mutator.evolve(specimen)
+                
                 print ('Specimen sequence: ', specimen.genome)
+                
                 if self.survive(strain, 1) == True:
                     print('Evolved!')
                     evolved = True
                     print('With target', self.target)
                     break
-
                 elif self.survive(specimen, 0) == True:
                     print('Survived, duplicating')
-                    pops.append(specimen)
-                
+                    pops.append(specimen)                
                 else:
                     print('Died')
                     pops.remove(specimen)
@@ -112,18 +114,24 @@ class Selection(Source):
                     print('Population extinct, reseeding...')
                     strain.spawn((len(self.target)+1))
                     pops.append(strain)
+                    break
+
                 elif len(pops) > self.popcap:
                     print('Population overcrowd, culling...')
                     sli = int(self.popcap/2)+1
                     pops = pops[0:sli]
-                    print('Population now', len(pops))
+                    break
+
             if counter > self.itercap: break
             if evolved: break
+
+
+
 def main():
-    target = 'GA'
-    threshold = 1
-    iter =  100
-    popcap = 10
+    target = 'GATTACA'
+    threshold = 3
+    iter =  5000
+    popcap = 50
     sample = Strain()
     sample.spawn(len(target)+1)
     enviro = Selection()

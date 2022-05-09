@@ -34,7 +34,7 @@ void printfield(FIELD field, bool all){
         }
         std::cout<<std::endl;
         if (i == 2|| i == 5){ 
-        for(int m = 0; m<=15; m++) std::cout<<"- ";
+        for(int m = 0; m<=10; m++) std::cout<<"-  ";
         std::cout<<std::endl;}  
     }
     std::cout<<std::endl;
